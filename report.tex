@@ -5,12 +5,20 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{tikz}
+\usetikzlibrary{arrows.meta,
+                positioning,
+                quotes}
 \lstset{language=C++,
                 basicstyle=\ttfamily,
                 keywordstyle=\color{blue}\ttfamily,
                 stringstyle=\color{red}\ttfamily,
                 commentstyle=\color{green}\ttfamily,
                 morecomment=[l][\color{magenta}]{\#}
+}
+\newcommand{\nodes}[1]{%
+    \foreach \num [count=\n starting from 0] in {#1}{% no need for an external counter
+      \node[minimum size=3mm, draw, circle] (n\n) at (\n,0) {\num};
+    }
 }
 
 \begin{document}
@@ -34,9 +42,23 @@ is i. In the union find problem we want to mantain a collection of disjointed se
     \item \textbf{union}(A, B): join the sets A and B in a single set. The name of the new set is A and the old sets A and B are destroyed.
     \item \textbf{find}($x$): given an element $x$, return the name of the set that contains it.
 \end{itemize}
-Figure ** shows an example  with n=6. Let's generalize the problem by removing the assumption that we have n elements a priori.
+\begin{figure}
+    \centering
+
+    \begin{tikzpicture}
+   
+     \nodes{1,2,3,4,5,6}
+     \node[minimum size=3mm] (start)[left=of n0] {\textbf{makeSet(1), ... , makeSet(6):}};
+     \node[minimum size=3mm] (u1)[below=of start] {\textbf{Union(2,3):}};
+     
+    \end{tikzpicture}
+    
+    \caption{A circle}
+    \label{fig:circle}
+\end{figure}
+Figure \ref{fig:circle} shows an example  with $n=6$. Let's generalize the problem by removing the assumption that we have n elements a priori.
 Initially there are no elements and no sets, and the the new elements are introduced by the operation:\begin{itemize}
-    \item makeSet($x$): Create a new set {x}. The name of the new set is $x$.
+    \item \textbf{makeSet}($x$): Create a new set {x}. The name of the new set is $x$.
 \end{itemize}
 We will say that the UnionFind problem consists of mantaining a collection of disjointed sets during 
 an arbitrary sequence of \emph{makeSet, union} and \emph{find} operations, starting from the empty set \cite{demetrescu}.
