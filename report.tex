@@ -5,11 +5,12 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,
+\usetikzlibrary{arrows,
                 positioning,
                 quotes,
                 shapes}
 \lstset{language=C++,
+                frame=single,
                 basicstyle=\ttfamily,
                 keywordstyle=\color{blue}\ttfamily,
                 stringstyle=\color{red}\ttfamily,
@@ -21,11 +22,11 @@
       \node[minimum size=3mm, draw, circle,fill=black!10] (n\n) at (\n,0) {\textbf{\num}};
     }
 }
-
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{dashedarrow} = [dashed,->,->=stealth]
 \begin{document}
 \title{ \textbf{Union Find}}
 \author{Niccolò Piazzesi\\n.piazzesi@studenti.unipi.it}
-\date{}
 \maketitle
 \begin{abstract}
 The Union Find data structure, also called Disjoint Set Union (DSU) is a very interesting data structure, not 
@@ -50,8 +51,10 @@ add new elements (and consequentially new sets). This is solved by introducing a
 \end{itemize}
 We will say that the UnionFind problem consists of mantaining a collection of disjointed sets during 
 an arbitrary sequence of \emph{makeSet, union} and \emph{find} operations, starting from the empty set \cite{demetrescu}. Figure \ref{fig:circle} shows a
-simple example where the elements considered are numbers.
-\newpage
+simple example where the elements considered are numbers. For the rest of the report we will consider a unionFind problem with
+$n$ makeSet operations and $m$ find operations. Since we have a total of n disjointed sets, we don't have to specify the number
+of union operations, because they cannot be more than $n-1$.
+
 \begin{figure}
     \centering
 
@@ -87,6 +90,7 @@ simple example where the elements considered are numbers.
     \node[minimum size=3mm] (f3) [below= of f2]{\textbf{Find(4):}};
     \node[minimum size=3mm] (f3n1)[right=1.7cm of f3]{\textbf{4}};
     
+    \draw [arrow] (u2) (u2n1);
     \end{tikzpicture}
     
     \caption{A running example with 6 initial elements. The name of each set is written in bold}
@@ -94,10 +98,42 @@ simple example where the elements considered are numbers.
 \end{figure}
 
 \section{Naive Implementations}
+The general idea for implementing UnionFind is to consider the collection as a forest of trees, with each tree represeting a single set. 
+In the following code we will only consider integers as elements and use an array representation of the forest.
+Given an array \emph{parents} the element \emph{parents[i]} contains the direct parent of element \emph{i} in the tree hierarchy. For the root
+r of a tree we will have parents[r] $=$ r. Before analyzing a more efficient implementation, we will see two simpler versions.
+\newpage
 \subsection{QuickFind}
+\begin{figure}[h!]
+\begin{tikzpicture}
+    \node[circle,fill=black!10, draw=, minimum size=3mm] (qf1) at (0,0) {\textbf{1}};
+    \node[circle,cross out, draw, minimum size=3mm] (qf2)[right= 3cm of qf1] {\textbf{3}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (qf3)[below= 2cm of qf1] {\textbf{1}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (qf4)[right= 0.3cm of qf3] {\textbf{2}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (qf5)[right= 0.3cm of qf4] {\textbf{3}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (qf6)[right= 0.3cm of qf5] {\textbf{4}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (qf7)[right= 0.3cm of qf6] {\textbf{5}};
+
+    \draw [arrow] (qf3) -- (qf1);
+    \draw [arrow] (qf4) --(qf1);
+    \draw [arrow] (qf5) --(qf1);
+    \draw [arrow] (qf6) --(qf1);
+    \draw [arrow] (qf7) --(qf1);
+    \draw [dashedarrow] (qf5) -- (qf2);
+    \draw [dashedarrow] (qf6) -- (qf2);
+    \draw [dashedarrow] (qf7) -- (qf2);
+\end{tikzpicture}
+\caption{Union(1, 3) using QuickFind}
+\label{fig:quickFind}
+\end{figure}
+\begin{center}
+    \lstinputlisting[language=C++,caption=Quickfind,label=lab:qf]{code/quickFind.cpp} 
+\end{center}
 
 \subsection{QuickUnion}
-\lstinputlisting[language=C++,caption=test,label=test]{code/test.cpp} 
+\begin{center}
+    \lstinputlisting[language=C++,caption=test,label=test]{code/quickUnion.cpp} 
+\end{center}
 \section{Balancing Heuristics}
 \section{Time complexity and proof}
 \section{Applications}
