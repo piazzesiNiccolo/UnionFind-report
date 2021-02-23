@@ -1,32 +1,34 @@
 
 #include <vector>
+#include<numeric>
 class QuickFind
 {
 
 private:
     int n;
-    std::vector<int> elements;
+    std::vector<int> parents;
 
 public:
     QuickFind(int n) : n(n)
     {
-        elements.resize(n);
+        parents.resize(n);
+        std::iota(parents.begin(), parents.end(), 0);
     }
 
     void makeSet(int x)
     {
-        if (x >= elements.size())
-            elements.resize(x);
-        elements.at(x) = x
+        if (x >= parents.size())
+            parents.resize(x);
+        parents.at(x) = x
     }
     int find(int x)
     {
-        return elements[x];
+        return parents[x];
     }
 
     void set_union(int a, int b)
     {
-        for (auto i : elements)
+        for (auto i : parents)
         {
             if (i == b)
                 i = a;
