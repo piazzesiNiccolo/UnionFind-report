@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <numeric>
 class QuickUnion
 {
 
@@ -11,6 +12,7 @@ public:
     QuickUnion(int n) : n(n)
     {
         parents.resize(n);
+        std::iota(parents.begin(), parents.end(), 0);
     }
 
     void makeSet(int x)

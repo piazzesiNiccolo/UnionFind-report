@@ -98,15 +98,23 @@ of union operations, because they cannot be more than $n-1$.
 \end{figure}
 
 \section{Naive Implementations}
-The general idea for implementing UnionFind is to consider the collection as a forest of trees, with each tree represeting a single set. 
+The general idea for implementing UnionFind is to consider the collection as a forest of trees, with each tree representing a single set. 
 In the following code we will only consider integers as elements and use an array representation of the forest.
 Given an array \emph{parents} the element \emph{parents[i]} contains the direct parent of element \emph{i} in the tree hierarchy. For the root
 r of a tree we will have parents[r] $=$ r. Before analyzing a more efficient implementation, we will see two simpler versions.
 \newpage
 \subsection{QuickFind}
+QuickFind aims at having a very good time complexity for the find operation. To achieve this, it represent each set as a tree of height 1. Each element
+has a pointer to the root of the tree,  and the root contains the name of the set. The find operation simply follows the pointer and returns the name of the
+set. It's easy to see that it has $O(1)$ time complexity. MakeSet(e) creates a new tree composed by two nodes: the root and a single leaf child. It stores e both in the root and
+in the leaf. MakeSet is $O(1)$ as well. The union operation deletes the pointer from the elements to the root of the old tree
+and add new pointers to the root of the new tree. In the worst case, this takes $O(n)$. Figure \ref{fig:quickFind} gives a visualization of this operation. Space complexity is $(O(n)$. 
+
 \begin{figure}[h!]
 \begin{tikzpicture}
-    \node[circle,fill=black!10, draw=, minimum size=3mm] (qf1) at (0,0) {\textbf{1}};
+ 
+    \node[circle,fill=black!10, draw=, minimum size=3mm] (qf8) at (0,0) {\textbf{1}};
+    \node[circle,fill=black!10, draw=, minimum size=3mm] (qf1)[right= 3cm of qf8] {\textbf{1}};
     \node[circle,cross out, draw, minimum size=3mm] (qf2)[right= 3cm of qf1] {\textbf{3}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf3)[below= 2cm of qf1] {\textbf{1}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf4)[right= 0.3cm of qf3] {\textbf{2}};
@@ -114,25 +122,30 @@ r of a tree we will have parents[r] $=$ r. Before analyzing a more efficient imp
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf6)[right= 0.3cm of qf5] {\textbf{4}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf7)[right= 0.3cm of qf6] {\textbf{5}};
 
+    \node[circle,fill=black!10, draw=, minimum size=3mm] (qf9) [below = 2cm of qf8] {\textbf{1}};
     \draw [arrow] (qf3) -- (qf1);
     \draw [arrow] (qf4) --(qf1);
     \draw [arrow] (qf5) --(qf1);
     \draw [arrow] (qf6) --(qf1);
     \draw [arrow] (qf7) --(qf1);
+    \draw [arrow] (qf9) --(qf8);
     \draw [dashedarrow] (qf5) -- (qf2);
     \draw [dashedarrow] (qf6) -- (qf2);
     \draw [dashedarrow] (qf7) -- (qf2);
 \end{tikzpicture}
 \caption{Union(1, 3) using QuickFind}
+Listing \ref{lab:qf} shows a possible implementation in $C++$. As i said before,
+we use an array representation so each pointer becomes simply an element of the array.
+If for example we want to compute find(3) we return the element parents$[3]$;
 \label{fig:quickFind}
 \end{figure}
 \begin{center}
-    \lstinputlisting[language=C++,caption=Quickfind,label=lab:qf]{code/quickFind.cpp} 
+    \lstinputlisting[language=C++,caption=Quickfind implementation,label=lab:qf]{code/quickFind.cpp} 
 \end{center}
 
 \subsection{QuickUnion}
 \begin{center}
-    \lstinputlisting[language=C++,caption=test,label=test]{code/quickUnion.cpp} 
+    \lstinputlisting[language=C++,caption=QuickUnion implementation,label=lab:qu]{code/quickUnion.cpp} 
 \end{center}
 \section{Balancing Heuristics}
 \section{Time complexity and proof}
