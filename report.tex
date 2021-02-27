@@ -18,7 +18,7 @@
                 morecomment=[l][\color{magenta}]{\#}
 }
 \newcommand{\nodes}[1]{%
-    \foreach \num [count=\n starting from 0] in {#1}{% no need for an external counter
+    \foreach \num [count=\n starting from 0] in {#1}{
       \node[minimum size=3mm, draw, circle,fill=black!10] (n\n) at (\n,0) {\textbf{\num}};
     }
 }
@@ -113,26 +113,37 @@ and add new pointers to the root of the new tree. In the worst case, this takes 
 \begin{figure}[h!]
 \begin{tikzpicture}
  
+    
     \node[circle,fill=black!10, draw=, minimum size=3mm] (qf8) at (0,0) {\textbf{1}};
+    \node[circle,fill=black!10, draw=, minimum size=3mm] (qf9) [below = 2cm of qf8] {\textbf{1}};
     \node[circle,fill=black!10, draw=, minimum size=3mm] (qf1)[right= 3cm of qf8] {\textbf{1}};
     \node[circle,cross out, draw, minimum size=3mm] (qf2)[right= 3cm of qf1] {\textbf{3}};
-    \node[circle,fill=black!10, draw, minimum size=3mm] (qf3)[below= 2cm of qf1] {\textbf{1}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (qf3)[right= 2cm of qf9] {\textbf{1}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf4)[right= 0.3cm of qf3] {\textbf{2}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf5)[right= 0.3cm of qf4] {\textbf{3}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf6)[right= 0.3cm of qf5] {\textbf{4}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (qf7)[right= 0.3cm of qf6] {\textbf{5}};
-    \node[circle,fill=black!10, draw=, minimum size=3mm] (qf9) [below = 2cm of qf8] {\textbf{1}};
+    
+    \node[circle,fill=black!10, draw=, minimum size=6mm] (qf10) [right = 1.5cm of qf2] {y};
+    \node[circle,fill=black!10, draw=, minimum size=6mm] (qf11) [right = 1cm of qf7] {};
+    \node[circle,fill=black!10, draw=, minimum size=6mm] (qf12) [right = 0.3cm of qf11] {\textbf{x}};
+    \node[circle,fill=black!10, draw=, minimum size=6mm] (qf13) [right = 0.3cm of qf12] {};
+    \node[circle,fill=black!10, draw=, minimum size=6mm] (qf14) [right = 0.3cm of qf13] {};
     \draw [arrow] (qf3) -- (qf1);
     \draw [arrow] (qf4) --(qf1);
     \draw [arrow] (qf5) --(qf1);
     \draw [arrow] (qf6) --(qf1);
     \draw [arrow] (qf7) --(qf1);
     \draw [arrow] (qf9) --(qf8);
+    \draw [arrow] (qf11) -- (qf10);
+    \draw [arrow] (qf12) -- (qf10);
+    \draw [arrow] (qf13) -- (qf10);
+    \draw [arrow] (qf14) -- (qf10);
     \draw [dashedarrow] (qf5) -- (qf2);
     \draw [dashedarrow] (qf6) -- (qf2);
     \draw [dashedarrow] (qf7) -- (qf2);
 \end{tikzpicture}
-\caption{Union(1, 3) using QuickFind}
+\caption{makeSet(1), Union(1, 3) and find(x) = y using QuickFind}
 
 \label{fig:quickFind}
 \end{figure}
@@ -144,24 +155,32 @@ If for example we want to compute find(3) we return the element parents$[3]$;
 \end{center}
 
 \subsection{QuickUnion}
-In QuickUnion we also use trees, but they can have height $\geq$ 1. Each element has a pointer to their
+In QuickUnion we also use trees, but they can have height $\neq$ 1. Each element has a pointer to their
 direct parent in the tree. MakeSet is identical to the QuickFind implementation. Union(A,B) makes the root of B a child of the 
 root of A, by simply adding a pointer. The find operation is slightly more complez. Let's say
 we want to compute find(\emph{e}) for a generic \emph{e}. Starting from \emph{e} we repeatedly 
 follow the pointer to the father until we find the root of the tree.
 \begin{figure}[h!]
     \includegraphics[width=\textwidth]  {img/uf.jpg}
-    \caption{makeSet(x), union(A,B) and find(x) in QuickUnion}
+    \caption{makeSet(x), union(A,B) and find(x) = y in QuickUnion}
     \label{fig:quickUnion}
 \end{figure}
 \newpage
 The time complexity of find grows linearly with the height of the tree. It's easy to see
 that, if we start with $n$ disjointed sets the worst case is having a tree of height $n$. A sequence
 of $n-1$ union operations that could lead to this case is the following: union(1,2), union(2,3),..., union(n-1,n).
-In this situation, find has $O(n)$ time complexity.
+In this situation, find has $O(n)$ time complexity. 
 \begin{center}
     \lstinputlisting[language=C++,caption=QuickUnion implementation,label=lab:qu]{code/quickUnion.cpp} 
 \end{center}
+Let's discuss the cost of union. As previously said,
+this consists in creating a new pointer from the root of the old tree to the root of the new tree. This can be done 
+very easily in $O(1)$ time. If we look to the implementation in Listing \ref{lab:qu} we notice
+that in the union operation we first call find to find the root of the trees containing the elements. Find takes $O(n)$ and this dominates the 
+total complexity, so the union method in that code takes $ O(n)$ as well. But this is just one possible implementation, and we analyze
+the abstract operation, so our previous analysis is still valid. 
+In the next section, we will see some techniques that helps in improving the complexity of the code, by using various heuristics techniques.
+
 \section{Balancing Heuristics}
 \section{Time complexity and proof}
 \section{Applications}

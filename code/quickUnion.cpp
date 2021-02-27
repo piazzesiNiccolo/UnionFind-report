@@ -3,7 +3,6 @@
 #include <numeric>
 class QuickUnion
 {
-
 private:
     int n;
     std::vector<int> parents;
@@ -24,10 +23,7 @@ public:
     int find(int x)
     {
         int p = x;
-        while (parents[p] != p)
-        {
-            p = parents[p];
-        }
+        if(parents[p] != p) p = find(parents[p]);
         return p;
     }
 
@@ -35,7 +31,6 @@ public:
     {
         int pa = find(a);
         int pb = find(b);
-
         parents[pb] = pa;
     }
 };
