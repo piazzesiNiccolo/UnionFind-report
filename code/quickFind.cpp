@@ -19,7 +19,7 @@ public:
     {
         if (x >= parents.size())
             parents.resize(x);
-        parents.at(x) = x
+        parents.at(x) = x;
     }
     int find(int x)
     {
@@ -28,6 +28,7 @@ public:
 
     void set_union(int a, int b)
     {
+        
         for (auto i : parents)
         {
             if (i == b)

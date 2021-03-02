@@ -65,24 +65,24 @@ of union operations, because they cannot be more than $n-1$.
     \node[minimum size = 3mm](start)[left=1cm of n0]{\textbf{makeSet(1..6):}};
     \node[minimum size=3mm] (u1)[below=of start] {\textbf{Union(2,3):}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (u1n1)[right=1.3cm of u1] {\textbf{1}};
-    \node[ellipse,fill=black!10,draw,fill=black!10, minimum size=3mm] (u1n2)[right=0.3cm of u1n1] {\textbf{2},3};
-    \node[circle,fill=black!10, draw, minimum size=3mm] (u1n3)[right=0.3cm of u1n2] {\textbf{4}};
-    \node[circle,fill=black!10, draw, minimum size=3mm] (u1n4)[right=0.3cm of u1n3] {\textbf{5}};
-    \node[circle,fill=black!10, draw, minimum size=3mm] (u1n5)[right=0.3cm of u1n4] {\textbf{6}};
+    \node[ellipse,fill=black!10,draw,fill=black!10, minimum size=3mm] (u1n2)[right=1cm of u1n1] {\textbf{2},3};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (u1n3)[right=1cm of u1n2] {\textbf{4}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (u1n4)[right=1cm of u1n3] {\textbf{5}};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (u1n5)[right=1cm of u1n4] {\textbf{6}};
     
     \node[minimum size=3mm] (f1) [below= of u1]{\textbf{Find(3):}};
     \node[minimum size=3mm] (f1n1)[right=1.7cm of f1]{\textbf{2}};
     
     \node[minimum size=3mm] (u2)[below=of f1] {\textbf{Union(5,6):}};
     \node[circle,fill=black!10, draw, minimum size=3mm] (u2n1)[right=1.3cm of u2] {\textbf{1}};
-    \node[ellipse,fill=black!10,draw, minimum size=3mm] (u2n2)[right=0.3cm of u2n1] {\textbf{2},3};
-    \node[circle,fill=black!10, draw, minimum size=3mm] (u2n3)[right=0.3cm of u2n2] {\textbf{4}};
-    \node[ellipse,fill=black!10,draw, minimum size=3mm] (u2n4)[right=0.3cm of u2n3] {\textbf{5},6};
+    \node[ellipse,fill=black!10,draw, minimum size=3mm] (u2n2)[right=1cm of u2n1] {\textbf{2},3};
+    \node[circle,fill=black!10, draw, minimum size=3mm] (u2n3)[right=1cm of u2n2] {\textbf{4}};
+    \node[ellipse,fill=black!10,draw, minimum size=3mm] (u2n4)[right=1cm of u2n3] {\textbf{5},6};
     
     \node[minimum size=3mm] (u3)[below=of u2] {\textbf{Union(5,1):}};
     \node[ellipse,fill=black!10,draw, minimum size=3mm] (u3n1)[right=1.3cm of u3] {\textbf{5},6,1};
-    \node[ellipse,fill=black!10,draw, minimum size=3mm] (u3n2)[right=0.3cm of u3n1] {\textbf{2},3};    
-    \node[circle,fill=black!10, draw, minimum size=3mm] (u3n3)[right=0.3cm of u3n2] {\textbf{4}};
+    \node[ellipse,fill=black!10,draw, minimum size=3mm] (u3n2)[right=1cm of u3n1] {\textbf{2},3};    
+    \node[circle,fill=black!10, draw, minimum size=3mm] (u3n3)[right=1cm of u3n2] {\textbf{4}};
     
     \node[minimum size=3mm] (f2) [below= of u3]{\textbf{Find(1):}};
     \node[minimum size=3mm] (f2n1)[right=1.7cm of f2]{\textbf{5}};
@@ -103,7 +103,7 @@ In the following code we will only consider integers as elements and use an arra
 Given an array \emph{parents} the element \emph{parents[i]} contains the direct parent of element \emph{i} in the tree hierarchy. For the root
 r of a tree we will have parents[r] $=$ r. Before analyzing a more efficient implementation, we will see two simpler versions.
 \newpage
-\subsection{QuickFind}
+\subsection{QuickFind} \label{QF}
 QuickFind aims at having a very good time complexity for the find operation. To achieve this, it represent each set as a tree of height 1. Each element
 has a pointer to the root of the tree,  and the root contains the name of the set. The find operation simply follows the pointer and returns the name of the
 set. It's easy to see that it has $O(1)$ time complexity. MakeSet(e) creates a new tree composed by two nodes: the root and a single leaf child. It stores e both in the root and
@@ -161,7 +161,8 @@ root of A, by simply adding a pointer. The find operation is slightly more compl
 we want to compute find(\emph{e}) for a generic \emph{e}. Starting from \emph{e} we repeatedly 
 follow the pointer to the father until we find the root of the tree.
 \begin{figure}[h!]
-    \includegraphics[width=\textwidth]  {img/uf.jpg}
+    \centering
+    \includegraphics[width=0.9\textwidth]  {img/uf.jpg}
     \caption{makeSet(x), union(A,B) and find(x) = y in QuickUnion}
     \label{fig:quickUnion}
 \end{figure}
@@ -179,9 +180,40 @@ very easily in $O(1)$ time. If we look to the implementation in Listing \ref{lab
 that in the union operation we first call find to find the root of the trees containing the elements. Find takes $O(n)$ and this dominates the 
 total complexity, so the union method in that code takes $ O(n)$ as well. But this is just one possible implementation, and we analyze
 the abstract operation, so our previous analysis is still valid. 
-In the next section, we will see some techniques that helps in improving the complexity of the code, by using various heuristics techniques.
 
 \section{Balancing Heuristics}
+Now we will see some heuristics that aim to improve the time complexity of the operations descibed. In particular
+we will first see aan heuristic to improve union in the quickFind algorithm and then various heuristics to improve
+find in the QuickUnion algorithm. Note that in this section we will simply describe the techniques while the 
+complexity analysis will be shown in the next part.
+\subsection{Balancing union in QuickFind}
+To improve the performance of QuickFind we must focus on the most expensive operation, which we know is 
+union. We can observe that the implementation that we described in section \ref{QF} is not very smart. The more $ | B | $ the more
+Union(A, B) costs. When we have $|A| < |B| $ it is more efficient to move the nodes of the set A. The new set
+$A \cup B$ will still be named A.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        
+        \node[circle,cross out,fill=black!10, draw=, minimum size=3mm] (qf1) at (0,0) {\textbf{A}};
+        \node[circle,fill=black!10, draw=, minimum size=6mm] (qf2)[right= 3cm of qf1] {\textbf{B}};
+        \node[circle,fill=black!10, draw=, minimum size=6mm] (qf3)[below= 3cm of qf1] {};
+        \node[circle,fill=black!10, draw=, minimum size=6mm] (qf4)[right= 1cm of qf3] {};
+        \node[circle,fill=black!10, draw=, minimum size=6mm] (qf5)[right= 1cm of qf4] {};
+        \node[circle,fill=black!10, draw=, minimum size=6mm] (qf6)[right= 1cm of qf5] {};
+        \node[circle,fill=black!10, draw=, minimum size=6mm] (qf7)[right= 1cm of qf6] {};
+        \draw[dashedarrow] (qf3) -- (qf1);
+        \draw[dashedarrow] (qf4) -- (qf1);
+        \draw[arrow] (qf3) -- (qf2);
+        \draw[arrow] (qf4) -- (qf2);
+        \draw[arrow] (qf5) -- (qf2);
+        \draw[arrow] (qf6) -- (qf2);
+        \draw[arrow] (qf7) -- (qf2);
+    \end{tikzpicture}
+    \caption{Union(A,B) when $|A| < |B|$}
+    \label{fig:qfsize}
+\end{figure}
 \section{Time complexity and proof}
 \section{Applications}
 \bibliographystyle{plain}
