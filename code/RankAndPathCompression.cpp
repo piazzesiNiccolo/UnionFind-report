@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
+#include <algorithm>
 class UnionFind
 {
 
@@ -27,20 +28,22 @@ public:
     int find(int x)
     {
         int p = x;
-        if(parents[p] != p) parents[p] = find(parents[p]);
+        if (parents[p] != p)
+            parents[p] = find(parents[p]);
         return parents[p];
     }
 
     void set_union(int a, int b)
     {
-        int pa = find(a);
-        int pb = find(b);
-        if(ranks[pa] < ranks[pb]) parents[pa] = pb;
-        else if (ranks[pa] < ranks[pb]) parents[pb] = pa;
-        else{
-            parents[pb] = pa;
-            ranks[pa]++;
+        a = find(a);
+        b = find(b);
+        if (a != b)
+        {
+            if (ranks[a] < ranks[b])
+                std::swap(a, b);
+            parents[b] = a;
+            if (ranks[a] == ranks[b])
+                ranks[a]++;
         }
-        
     }
 };

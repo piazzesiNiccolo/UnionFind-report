@@ -10,13 +10,18 @@
                 quotes,
                 shapes}
 \lstset{language=C++,
-                frame=single,
-                basicstyle=\ttfamily,
+                frame=tb,
+                aboveskip=3mm,
+                belowskip=3mm,
+                showstringspaces=false,
+                columns=flexible,
+                basicstyle={\small\ttfamily},
+                numbers=none,
                 keywordstyle=\color{blue}\ttfamily,
                 stringstyle=\color{red}\ttfamily,
                 commentstyle=\color{green}\ttfamily,
                 morecomment=[l][\color{magenta}]{\#}
-}
+        }
 \newcommand{\nodes}[1]{%
     \foreach \num [count=\n starting from 0] in {#1}{
       \node[minimum size=3mm, draw, circle,fill=black!10] (n\n) at (\n,0) {\textbf{\num}};
@@ -41,15 +46,15 @@ Initially these elements
 are organized in n disjointed sets \{1\},\{2\},...,\{n\}. For simplicity we will assume that the name of set \{i\}
 is i. In the union find problem we want to mantain a collection of disjointed sets while supporting the following operations:
 \begin{itemize}
-    \item \textbf{union}(A, B): join the sets A and B in a single set. The name of the new set is A and the old sets A and B are destroyed.
+    \item \textbf{union}(A, B): join the sets A and B in a single set $A \cup B$. The old sets A and B are destroyed.
     \item \textbf{find}($x$): given an element $x$, return the name of the set that contains it.
 \end{itemize}
 Let's now generalize the problem. We have assumed before that the n elements are already given. This is not true in general, so we need a way to 
 add new elements (and consequentially new sets). This is solved by introducing a third operation:
 \begin{itemize}
-    \item \textbf{makeSet}($x$): Create a new set {$x$} containing the single element $x$. The name of the new set is $x$.
+    \item \textbf{makeSet}($x$): Create a new set {$x$} containing the single element $x$.
 \end{itemize}
-We will say that the UnionFind problem consists of mantaining a collection of disjointed sets during 
+    We will say that the UnionFind problem consists of mantaining a collection of disjointed sets during 
 an arbitrary sequence of \emph{makeSet, union} and \emph{find} operations, starting from the empty set \cite{demetrescu}. Figure \ref{fig:circle} shows a
 simple example where the elements considered are numbers. For the rest of the report we will consider a unionFind problem with
 $n$ makeSet operations and $m$ find operations. Since we have a total of n disjointed sets, we don't have to specify the number
@@ -154,7 +159,7 @@ If for example we want to compute find(3) we return the element parents$[3]$;
     \lstinputlisting[language=C++,caption=Quickfind implementation,label=lab:qf]{code/quickFind.cpp} 
 \end{center}
 
-\subsection{QuickUnion}
+\subsection{QuickUnion} \label{QU}
 In QuickUnion we also use trees, but they can have height $\neq$ 1. Each element has a pointer to their
 direct parent in the tree. MakeSet is identical to the QuickFind implementation. Union(A,B) makes the root of B a child of the 
 root of A, by simply adding a pointer. The find operation is slightly more complez. Let's say
@@ -214,6 +219,92 @@ $A \cup B$ will still be named A.
     \caption{Union(A,B) when $|A| < |B|$}
     \label{fig:qfsize}
 \end{figure}
+In the implementation, we store an auxiliary array \emph{size} which keeps track
+of the cardinality of each set.
+\begin{lstlisting}[caption=updated operations in QuickFind, label=lab:qfu]
+    QuickFind(int n) : n(n)
+    {
+        parents.resize(n);
+        std::iota(parents.begin(), parents.end(), 0);
+        std::vector<int> size(n, 1);
+    }
+
+    void makeSet(int x)
+    {
+        if (x >= parents.size())
+            parents.resize(x);
+        parents.at(x) = x;
+        size.at(x) = 1;
+    }
+    void set_union(int a, int b)
+    {
+        if (a != b)
+        {
+            if(size[a] < size[b]) std::swap(a,b);
+            for (auto i : parents)
+            {
+                if (i == b)
+                    i = a;
+            }
+            size[a] += size[b];
+        }
+    }
+    
+\end{lstlisting}
+\subsection{Balancing heuristics for QuickUnion}
+To improve the QuickUnion algorithm, we need to make \emph{find} more efficient.
+In section \ref{QU} we observed that this operation has a worst-case $O(n)$ time complexity.
+This is due to the fact that we allow the height of the trees to grow without any control when 
+doing a \emph{union}. 
+\paragraph{Union by Size}
+The first heuristic uses the same idea of the QuickFind union heuristic. When doing \emph{Union(A,B)}
+we make the smaller set in size child of the bigger set.
+\begin{lstlisting}[caption=Union by size implementation, label=quu]
+    void set_union(int a, int b)
+    {
+        a = find(a);
+        b = find(b);
+        if (a != b) {
+            if (size[a] < size[b])
+                std::swap(a, b);
+            parents[b] = a;
+            size[a] += size[b];
+        }
+    }
+
+\end{lstlisting}
+\paragraph{Union By Rank} In union by rank we use the depth of the tree instead
+of its size. The approach is the same of Union By size: we attach the shorter tree
+to the taller one.
+\begin{lstlisting}[caption=QuickUnion using Union by Rank]
+    QuickUnion(int n) : n(n)
+    {
+        parents.resize(n);
+        std::iota(parents.begin(), parents.end(), 0);
+        ranks.resize(n);
+    }
+
+    void makeSet(int x)
+    {
+        if (x >= parents.size())
+            parents.resize(x);
+        parents.at(x) = x;
+        ranks.at(x) = 0;
+    }
+    void set_union(int a, int b)
+    {
+        a = find(a);
+        b = find(b);
+        if (a != b)
+        {
+            if (ranks[a] < ranks[b])
+                std::swap(a, b);
+            parents[b] = a;
+            if (ranks[a] == ranks[b])
+                ranks[a]++;
+        }
+    }
+\end{lstlisting}
 \section{Time complexity and proof}
 \section{Applications}
 \bibliographystyle{plain}

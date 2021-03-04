@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.mli": "ocaml",
         "iosfwd": "cpp",
         "fstream": "cpp",
         "ostream": "cpp",
@@ -38,6 +39,21 @@
         "xstddef": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "array": "cpp",
+        "hash_map": "cpp",
+        "*.tcc": "cpp",
+        "concepts": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "optional": "cpp",
+        "string_view": "cpp",
+        "sstream": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp",
+        "functional": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp",
+        "condition_variable": "cpp"
     }
 }
