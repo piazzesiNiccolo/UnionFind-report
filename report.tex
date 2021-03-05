@@ -107,7 +107,7 @@ The general idea for implementing UnionFind is to consider the collection as a f
 In the following code we will only consider integers as elements and use an array representation of the forest.
 Given an array \emph{parents} the element \emph{parents[i]} contains the direct parent of element \emph{i} in the tree hierarchy. For the root
 r of a tree we will have parents[r] $=$ r. Before analyzing a more efficient implementation, we will see two simpler versions.
-\newpage
+
 \subsection{QuickFind} \label{QF}
 QuickFind aims at having a very good time complexity for the find operation. To achieve this, it represent each set as a tree of height 1. Each element
 has a pointer to the root of the tree,  and the root contains the name of the set. The find operation simply follows the pointer and returns the name of the
@@ -116,6 +116,7 @@ in the leaf. MakeSet is $O(1)$ as well. The union operation deletes the pointer 
 and add new pointers to the root of the new tree. In the worst case, this takes $O(n)$. Figure \ref{fig:quickFind} gives a visualization of this operation. Space complexity is $(O(n)$. 
 
 \begin{figure}[h!]
+    \centering
 \begin{tikzpicture}
  
     
@@ -167,11 +168,11 @@ we want to compute find(\emph{e}) for a generic \emph{e}. Starting from \emph{e}
 follow the pointer to the father until we find the root of the tree.
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.9\textwidth]  {img/uf.jpg}
+    \includegraphics[width=0.8\textwidth]  {img/uf.jpg}
     \caption{makeSet(x), union(A,B) and find(x) = y in QuickUnion}
     \label{fig:quickUnion}
 \end{figure}
-\newpage
+
 The time complexity of find grows linearly with the height of the tree. It's easy to see
 that, if we start with $n$ disjointed sets the worst case is having a tree of height $n$. A sequence
 of $n-1$ union operations that could lead to this case is the following: union(1,2), union(2,3),..., union(n-1,n).
@@ -276,6 +277,11 @@ we make the smaller set in size child of the bigger set.
 \paragraph{Union By Rank} In union by rank we use the depth of the tree instead
 of its size. The approach is the same of Union By size: we attach the shorter tree
 to the taller one.
+\begin{figure}[h!]
+    \includegraphics[width=0.9\linewidth]{img/urank.png}
+    \caption{Union(A,B) when rank(A) < rank(B)}
+    \label{fig:urank}
+\end{figure}
 \begin{lstlisting}[caption=QuickUnion using Union by Rank]
     QuickUnion(int n) : n(n)
     {
@@ -291,8 +297,7 @@ to the taller one.
         parents.at(x) = x;
         ranks.at(x) = 0;
     }
-    void set_union(int a, int b)
-    {
+    void set_union(int a, int b){
         a = find(a);
         b = find(b);
         if (a != b)
@@ -305,6 +310,51 @@ to the taller one.
         }
     }
 \end{lstlisting}
+To further improve QuickUnion performance we can also modify \emph{find} in order to reduce the height of a tree
+even more. Let $u_0. u_1, \dots, u_{l-1}$ the nodes visited during \emph{find(x)}, where $u_0 = x$ and $u_{l-1}$ is
+the root of the tree containing $x$. We can assume $l \geq 3$, because if $l\leq 2$ we dont need to reduce the height.
+We can apply one of the following compression heuristics:
+\paragraph{Path compression} make all the nodes $u_i$ ($ 0 \leq i \leq l-3$) children of the root $u_{l-1}$
+\begin{lstlisting}
+    int find(int x){
+        int p = x;
+        if (parents[p] != p)
+            parents[p] = find(parents[p]); //path compression
+        return parents[p];
+    }
+\end{lstlisting}
+\paragraph{Path splitting} make the node $u_i (0 \leq i \leq l-3)$ a child of its grandparent $u_{i+2}$ 
+\begin{lstlisting}
+    public int find(int x) {
+        while (x != parent[x]) {
+            int next = parent[x];
+            parent[x] = parent[next];   // path splitting
+            x = next;
+        }
+        return x;
+    }
+\end{lstlisting}
+\paragraph{Path halving} make the node $u_{2i} ( 0 \leq i \leq \lfloor \frac{l-1}{2}\rfloor - 1)$ a child 
+of its grandparent $u_{2i+2}$
+\begin{lstlisting}
+    public int find(int x) {
+        while (x != parent[x]) {
+            parent[x] = parent[parent[x]];    // path  halving
+            x = parent[x];
+        }
+        return x;
+    }
+\end{lstlisting}
+ashjbnasbhs
+\begin{figure}
+    \includegraphics[width = \linewidth]{img/pc.jpg}
+    \caption{(a) The tree before executing \emph{find(F)};
+    (b) \emph{find(F)} with path compression;
+    (c) \emph{find(F)} with path splitting;
+    (d) \emph{find(F)} with path halving;
+    }
+    \label{fig:pc}   
+\end{figure}
 \section{Time complexity and proof}
 \section{Applications}
 \bibliographystyle{plain}

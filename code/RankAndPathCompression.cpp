@@ -28,9 +28,9 @@ public:
     int find(int x)
     {
         int p = x;
-        if (parents[p] != p)
-            parents[p] = find(parents[p]);
-        return parents[p];
+        if (parents[x] != x)
+            parents[x] = find(parents[x]);
+        return parents[x];
     }
 
     void set_union(int a, int b)
