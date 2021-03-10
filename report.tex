@@ -314,7 +314,7 @@ To further improve QuickUnion performance we can also modify \emph{find} in orde
 even more. Let $u_0. u_1, \dots, u_{l-1}$ the nodes visited during \emph{find(x)}, where $u_0 = x$ and $u_{l-1}$ is
 the root of the tree containing $x$. We can assume $l \geq 3$, because if $l\leq 2$ we dont need to reduce the height.
 We can apply one of the following compression heuristics:
-\paragraph{Path compression} make all the nodes $u_i$ ($ 0 \leq i \leq l-3$) children of the root $u_{l-1}$
+\paragraph{Path compression} \cite{hopcroft1973set} make all the nodes $u_i$ ($ 0 \leq i \leq l-3$) children of the root $u_{l-1}$
 \begin{lstlisting}
     int find(int x){
         int p = x;
@@ -323,7 +323,7 @@ We can apply one of the following compression heuristics:
         return parents[p];
     }
 \end{lstlisting}
-\paragraph{Path splitting} make the node $u_i (0 \leq i \leq l-3)$ a child of its grandparent $u_{i+2}$ 
+\paragraph{Path splitting} \cite{van1977alternative} make the node $u_i (0 \leq i \leq l-3)$ a child of its grandparent $u_{i+2}$ 
 \begin{lstlisting}
     public int find(int x) {
         while (x != parent[x]) {
@@ -334,7 +334,7 @@ We can apply one of the following compression heuristics:
         return x;
     }
 \end{lstlisting}
-\paragraph{Path halving} make the node $u_{2i} ( 0 \leq i \leq \lfloor \frac{l-1}{2}\rfloor - 1)$ a child 
+\paragraph{Path halving} \cite{van1977alternative} make the node $u_{2i} ( 0 \leq i \leq \lfloor \frac{l-1}{2}\rfloor - 1)$ a child 
 of its grandparent $u_{2i+2}$
 \begin{lstlisting}
     public int find(int x) {
@@ -357,6 +357,14 @@ ashjbnasbhs
 \end{figure}
 \section{Time complexity and proof}
 \section{Applications}
+\subsection{Detect cycle in a graph}
+\lstinputlisting{code/graphcycle.cpp}
+\subsection{Kruskal algorithm}
+\lstinputlisting{code/mst.cpp}
+\subsection{Lowest Common Ancestor in a tree}
+\lstinputlisting{code/offlineLCA.cpp}
+\subsection{Job Sequencing}
+
 \bibliographystyle{plain}
 \bibliography{bib}
 \end{document}
