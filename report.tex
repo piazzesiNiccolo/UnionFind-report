@@ -2,6 +2,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{babel}
+\usepackage{amsthm}
+\usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{tikz}
@@ -323,7 +325,7 @@ We can apply one of the following compression heuristics:
         return parents[p];
     }
 \end{lstlisting}
-\paragraph{Path splitting} \cite{van1977alternative} make the node $u_i (0 \leq i \leq l-3)$ a child of its grandparent $u_{i+2}$ 
+\paragraph{Path splitting} \cite{van1977alternative} \cite{van1980datastructures} make the node $u_i (0 \leq i \leq l-3)$ a child of its grandparent $u_{i+2}$ 
 \begin{lstlisting}
     public int find(int x) {
         while (x != parent[x]) {
@@ -334,7 +336,7 @@ We can apply one of the following compression heuristics:
         return x;
     }
 \end{lstlisting}
-\paragraph{Path halving} \cite{van1977alternative} make the node $u_{2i} ( 0 \leq i \leq \lfloor \frac{l-1}{2}\rfloor - 1)$ a child 
+\paragraph{Path halving} \cite{van1977alternative} \cite{van1980datastructures} make the node $u_{2i} ( 0 \leq i \leq \lfloor \frac{l-1}{2}\rfloor - 1)$ a child 
 of its grandparent $u_{2i+2}$
 \begin{lstlisting}
     public int find(int x) {
@@ -357,14 +359,34 @@ ashjbnasbhs
 \end{figure}
 \section{Time complexity and proof}
 \section{Applications}
-\subsection{Detect cycle in a graph}
+Let's now see some problems where the DSU data structure shows its power
+\subsection{Detect cycle in a graph} \label{loop}
 \lstinputlisting{code/graphcycle.cpp}
 \subsection{Kruskal algorithm}
-\lstinputlisting{code/mst.cpp}
+\begin{center}
+    \emph{Given a connected, undirected  and weighted  graph $G = (V,E)$ the \textbf{minimum spanning tree}(MST) T
+    is a subgraph of $G$ that is a tree and contains all the vertices $v \in V$}.   
+\end{center}
+
+
+There are many algorithms to find the MST of a given graph \cite{prim1957shortest} \cite{nevsetvril2001otakar},
+but now we will see the algorithm described by Joseph Kruskal \cite{kruskal1956shortest}.
+This algorithm starts from an empty tree and increasingly build the MST with the following steps:
+\begin{enumerate}
+    \item Sort all the edges by increasing weight.
+    \item \label{p}Pick the next smallest edge. If it forms a cycle with the  tree formed so far discard the edge, otherwise
+    add it to the tree.
+    \item Repeat step 2 until there are $|V| - 1$ edges in the tree.
+\end{enumerate}
+The central point of the algorithm is the cycle detection in step \ref{p}. A naive solution would be to simply do a DFS  visit of the tree for each edge.
+We can improve the solution with UnionFind,  by reusing and modifying the cycle detection algorithm described in \ref{loop}. This lead to the algorithm described in Listing \ref{lb:mst} 
+\paragraph{Time complexity.} $O(|E|\log|E|)$
+
+\lstinputlisting[caption=Kruskal Algorithm , label=lb:mst]{code/mst.cpp}
 \subsection{Lowest Common Ancestor in a tree}
 \lstinputlisting{code/offlineLCA.cpp}
 \subsection{Job Sequencing}
 \lstinputlisting{code/job_sequencing.cpp}
-\bibliographystyle{plain}
+\bibliographystyle{unsrt}
 \bibliography{bib}
 \end{document}

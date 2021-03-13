@@ -22,7 +22,7 @@ std::vector<Edge> mst(std::vector<Edge>& edges, int nodes){
         if(uf.find(e.u) != uf.find(e.v)){
             cost += e.weight;
             mst.push_back(e);
-            // the mst must not have more than n-1 edges
+            // the mst has n-1 edges
             if(mst.size() == nodes - 1) break; 
            
             uf.set_union(e.u,e.v);
