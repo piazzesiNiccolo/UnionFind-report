@@ -54,6 +54,8 @@
         "functional": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "condition_variable": "cpp"
+        "condition_variable": "cpp",
+        "list": "cpp",
+        "xhash": "cpp"
     }
 }

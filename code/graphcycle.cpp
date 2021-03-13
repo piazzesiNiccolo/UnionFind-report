@@ -4,30 +4,25 @@
 #include <algorithm>
 #include "RankAndPathCompression.cpp"
 
+struct Edge {
+    int u, v;
 
-int main(){
-    int n,m;
-    std::cin >> n;
-    UnionFind uf = UnionFind(n);
-    std::cin >> m;
+    Edge(int u, int v, int weight) : u(u), v(v){}
     
-    std::vector<std::pair<int,int>> edges;
-    edges.reserve(m);
-    while (m--)
-    {
-        int u,v;
-        std::cin >> u >> v;
-        edges.emplace_back(u,v);
-    }
+};
+
+
+bool graphcycle(std::vector<Edge> edges, int nodes){
+    
+    UnionFind uf = UnionFind(nodes);
     bool cycle = false;
     for(auto edge: edges){
-        if(uf.find(edge.first) == uf.find(edge.second)){
+        if(uf.find(edge.u) == uf.find(edge.v)){
             cycle = true;
             break;
         }
-        uf.set_union(edge.first,edge.second);
+        uf.set_union(edge.u,edge.v);
     }
-    std::string sol = cycle ? "cycle detected" : "cycle not detected";
-    std::cout << sol << std::endl;
+    return cycle;
 
 }
