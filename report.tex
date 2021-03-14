@@ -347,7 +347,6 @@ of its grandparent $u_{2i+2}$
         return x;
     }
 \end{lstlisting}
-ashjbnasbhs
 \begin{figure}
     \includegraphics[width = \linewidth]{img/pc.jpg}
     \caption{(a) The tree before executing \emph{find(F)};
@@ -359,14 +358,31 @@ ashjbnasbhs
 \end{figure}
 \section{Time complexity and proof}
 \section{Applications}
-Let's now see some problems where the DSU data structure shows its power
+Let's now see some problems where the DSU data structure shows its power.
 \subsection{Detect cycle in a graph} \label{loop}
-\lstinputlisting{code/graphcycle.cpp}
+\emph{Given an undirected graph $G = (V, E)$ check if it contains a cycle}
+
+\bigskip
+
+A trivial solution simply traverse the graph with a DFS visit in $O(|V| + |E|)$
+time. We can achieve a more efficient solution using UnionFind. Create a set for each
+vertex $v \in V$. Now, for every edge $ (u,v) \in E$:\begin{enumerate}
+    \item Find the root  of the sets that contain u and v
+    \item If we find  the same root, a cycle has been found and we stop 
+    \item Otherwise, merge the two sets
+\end{enumerate}
+
+\paragraph{Time complexity.} Each \emph{find} and \emph{union} takes $O(\log|V|)$
+at most and we need to do them for every edge $e$. This leads to a total time complexity
+of $O(|E|\log|V|)$.
+\paragraph{Space complexity.} $O(|V|)$
+\lstinputlisting[caption=Cycle detection]{code/graphcycle.cpp}
 \subsection{Kruskal algorithm}
-\begin{center}
-    \emph{Given a connected, undirected  and weighted  graph $G = (V,E)$ the \textbf{minimum spanning tree}(MST) T
-    is a subgraph of $G$ that is a tree and contains all the vertices $v \in V$}.   
-\end{center}
+\emph{Given a connected, undirected  and weighted  graph $G = (V,E)$,
+find  the \textbf{minimum spanning tree}(MST) T  of G. The minimum spanning tree 
+is a subgraph of $G$ that is a tree and contains all the vertices $v \in V$}.
+    
+\bigskip
 
 
 There are many algorithms to find the MST of a given graph \cite{prim1957shortest} \cite{nevsetvril2001otakar},
@@ -378,14 +394,24 @@ This algorithm starts from an empty tree and increasingly build the MST with the
     add it to the tree.
     \item Repeat step 2 until there are $|V| - 1$ edges in the tree.
 \end{enumerate}
-The central point of the algorithm is the cycle detection in step \ref{p}. A naive solution would be to simply do a DFS  visit of the tree for each edge.
-We can improve the solution with UnionFind,  by reusing and modifying the cycle detection algorithm described in \ref{loop}. This lead to the algorithm described in Listing \ref{lb:mst} 
+The central point of the algorithm is the cycle detection in step \ref{p}.For this we can use a modified version of the algorithm described in \ref{loop}. This lead to the solution 
+described in Listing \ref{lb:mst} 
 \paragraph{Time complexity.} $O(|E|\log|E|)$
 
 \lstinputlisting[caption=Kruskal Algorithm , label=lb:mst]{code/mst.cpp}
 \subsection{Lowest Common Ancestor in a tree}
+\emph{We have a tree T with  n nodes and m queries (u,v). For each qeury (u, v) we want to find
+the lowest common ancestor of u and v, which is the ancestor of both u and v that has the greatest depth in the tree.
+}
+
+ \bigskip
+ Note that a node $v$ is considered an ancestor of itself, so LCA(u, v) can also be one of the two.
+
 \lstinputlisting{code/offlineLCA.cpp}
 \subsection{Job Sequencing}
+\emph{There is a set of $n$ jobs, where each job has a deadline $d$ and a profit $p$ if the job
+is completed before the deadline. Find the subset of jobs that maximixes the total profit, given
+that only one job can be scheduled at a certain moment and completing it takes 1 unit of time.}
 \lstinputlisting{code/job_sequencing.cpp}
 \bibliographystyle{unsrt}
 \bibliography{bib}
