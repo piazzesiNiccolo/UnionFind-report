@@ -1,6 +1,4 @@
 
-#include <vector>
-#include<numeric>
 class QuickFind
 {
 

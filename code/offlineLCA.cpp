@@ -1,8 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <functional>
-#include "RankAndPathCompression.cpp"
-
 struct Lca
 {
     int u, v, ancestor;

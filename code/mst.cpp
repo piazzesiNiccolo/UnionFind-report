@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <numeric>
-#include <algorithm>
-#include "RankAndPathCompression.cpp"
-
 struct Edge {
     int u, v, weight;
 
@@ -16,11 +10,9 @@ struct Edge {
 std::vector<Edge> mst(std::vector<Edge>& edges, int nodes){
     UnionFind uf = UnionFind(nodes);
     std::sort(edges.begin(), edges.end());
-    int cost = 0;
     std::vector<Edge> mst;
     for(Edge e: edges){
         if(uf.find(e.u) != uf.find(e.v)){
-            cost += e.weight;
             mst.push_back(e);
             // the mst has n-1 edges
             if(mst.size() == nodes - 1) break; 

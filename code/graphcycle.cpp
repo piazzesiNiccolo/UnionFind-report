@@ -1,9 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include "RankAndPathCompression.cpp"
-
 struct Edge {
     int u, v;
 

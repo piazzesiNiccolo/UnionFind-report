@@ -164,7 +164,7 @@ If for example we want to compute find(3) we return the element parents$[3]$;
 
 \subsection{QuickUnion} \label{QU}
 In QuickUnion we also use trees, but they can have height $\neq$ 1. Each element has a pointer to their
-direct parent in the tree. MakeSet is identical to the QuickFind implementation. Union(A,B) makes the root of B a child of the 
+direct parent in the tree. MakeSet(x) creates a single node named x. Union(A,B) makes the root of B a child of the 
 root of A, by simply adding a pointer. The find operation is slightly more complez. Let's say
 we want to compute find(\emph{e}) for a generic \emph{e}. Starting from \emph{e} we repeatedly 
 follow the pointer to the father until we find the root of the tree.
@@ -383,8 +383,10 @@ find  the \textbf{minimum spanning tree}(MST) T  of G. The minimum spanning tree
 is a subgraph of $G$ that is a tree and contains all the vertices $v \in V$}.
     
 \bigskip
-
-
+\begin{figure}[h!]
+    \includegraphics[width = \linewidth]{img/mst.png}
+    \caption{An example of a minimum spanning tree}
+\end{figure}
 There are many algorithms to find the MST of a given graph \cite{prim1957shortest} \cite{nevsetvril2001otakar},
 but now we will see the algorithm described by Joseph Kruskal \cite{kruskal1956shortest}.
 This algorithm starts from an empty tree and increasingly build the MST with the following steps:
@@ -409,10 +411,37 @@ the lowest common ancestor of u and v, which is the ancestor of both u and v tha
 
 \lstinputlisting{code/offlineLCA.cpp}
 \subsection{Job Sequencing}
-\emph{There is a set of $n$ jobs, where each job has a deadline $d$ and a profit $p$ if the job
-is completed before the deadline. Find the subset of jobs that maximixes the total profit, given
+\emph{There is a lisr of $n$ jobs, where each job has a deadline $d$ and a profit $p$ if the job
+is completed before the deadline. Find the sublist of jobs that maximizes the total profit, given
 that only one job can be scheduled at a certain moment and completing it takes 1 unit of time.}
-\lstinputlisting{code/job_sequencing.cpp}
+
+\bigskip
+A greedy solution \cite{key} sorts the list of jobs by decreasing profit and tries to assign each job to the greatest available slot, ignoring it if no slots
+are found. This algorithm runs in $O(n^2)$.
+
+\medskip
+
+Lets see now a solution that makes use of UnionFind properties. We start by observing that the crucial aspect
+is to keep track of the greatest time slot available for a given job. We do this using disjoint sets. The basic idea is that the representative of a set
+is the latest free slot for each job in the set. If a job j is in set 0 it means that no slots can be assigned to it. Finding the representative
+of the set corresponds to the \emph{find} operation of UnionFind. When we assign a time slot t
+we merge the set t with the set that contains t-1 so that future queries for time slot t will return the latest time slot that is before t. Let's now describe the algorithm in full.
+
+\medskip
+
+The first step is sorting the jobs in decreasing order of their profit. After that we find the maximum deadline $m$ and create $m+1$ sets, representing the time slots.
+If a job is assigned to slot t, it gets executed from $t-1$ to $t$. As we said before, the slot 0 means there are no free time slots. Now we scan the list  of jobs and for each job j
+we do the following:\begin{enumerate}
+    \item find the latest available slot t
+    \item if $t \neq 0$ assign it to the current job and
+    execute \emph{union(t-1, t)}
+    \item otherwhise, skip this job.
+\end{enumerate}
+
+\paragraph{Time complexity.} Sorting the jobs takes $O(n \log n)$. For each iteration of the cycle
+the find can take at most $O(\log n)$. The total time complexity is $O(n\log n + n\log n) = O(n\log n)$.
+\paragraph{Space complexity.} $O(m)$ where m is the maximum deadline.
+\lstinputlisting[caption=Job sequencing, label=jbseq]{code/job_sequencing.cpp}
 \bibliographystyle{unsrt}
 \bibliography{bib}
 \end{document}
