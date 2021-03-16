@@ -57,7 +57,8 @@ add new elements (and consequentially new sets). This is solved by introducing a
     \item \textbf{makeSet}($x$): Create a new set {$x$} containing the single element $x$.
 \end{itemize}
     We will say that the UnionFind problem consists of mantaining a collection of disjointed sets during 
-an arbitrary sequence of \emph{makeSet, union} and \emph{find} operations, starting from the empty set \cite{demetrescu}. Figure \ref{fig:circle} shows a
+an arbitrary sequence of \emph{makeSet, union} and \emph{find} operations, starting from thalso be one of the two.
+The algorithm that we use is offline, meaning that it computes a solutione empty set \cite{demetrescu}. Figure \ref{fig:circle} shows a
 simple example where the elements considered are numbers. For the rest of the report we will consider a unionFind problem with
 $n$ makeSet operations and $m$ find operations. Since we have a total of n disjointed sets, we don't have to specify the number
 of union operations, because they cannot be more than $n-1$.
@@ -361,7 +362,11 @@ of its grandparent $u_{2i+2}$
 Let's now see some problems where the DSU data structure shows its power.
 \subsection{Detect cycle in a graph} \label{loop}
 \emph{Given an undirected graph $G = (V, E)$ check if it contains a cycle}
-
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{img/cycle.png}
+    \caption{A graph with a cycle}
+\end{figure}
 \bigskip
 
 A trivial solution simply traverse the graph with a DFS visit in $O(|V| + |E|)$
@@ -384,7 +389,8 @@ is a subgraph of $G$ that is a tree and contains all the vertices $v \in V$}.
     
 \bigskip
 \begin{figure}[h!]
-    \includegraphics[width = \linewidth]{img/mst.png}
+    \centering
+    \includegraphics[scale=0.8]{img/mst.png}
     \caption{An example of a minimum spanning tree}
 \end{figure}
 There are many algorithms to find the MST of a given graph \cite{prim1957shortest} \cite{nevsetvril2001otakar},
@@ -403,18 +409,50 @@ described in Listing \ref{lb:mst}
 \lstinputlisting[caption=Kruskal Algorithm , label=lb:mst]{code/mst.cpp}
 \subsection{Lowest Common Ancestor in a tree}
 \emph{We have a tree T with  n nodes and m queries (u,v). For each qeury (u, v) we want to find
-the lowest common ancestor of u and v, which is the ancestor of both u and v that has the greatest depth in the tree.
+the lowest common ancestor(LCA) of u and v, which is the ancestor of both u and v that has the greatest depth in the tree.
 }
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale = 0.5]{img/lca1.png}
+    \caption{LCA(3,6) = 1}
+\end{figure}
 
  \bigskip
  Note that a node $v$ is considered an ancestor of itself, so LCA(u, v) can also be one of the two.
+ The algorithm that we use is offline, meaning that it computes a solution only if we know
+ all queries beforehand. It a Let's now see how it works. 
+ 
+ \medskip
+ The algorithm answers all queries
+ with a single DFS visit. A query (u, v) is answered at node u, if v has already been visited
+ (or viceversa). Let's say we are at node u and want to find LCA(u, v). The answer is either v or the lowest node among
+the ancestors of v that is also an ancestor of u. To each ancestor $a$  of $v$ we assign a set
+that contains $a$ itself and all the subtrees with roots in the set of its other children
+that are not in the path to $v$. The set that contains u is the answer to our query. The main task is mantaining
+efficiently all these sets, and for this purpose we use union find. We also use an auxiliary vector \emph{ancestor} that
+will store the real representative of each set.
 
-\lstinputlisting{code/offlineLCA.cpp}
+After processing all the children of a node u we can answer all the
+queries(u, v) in which v has already been visited. This will be ancestor[\emph{find(u)}]. The full implementation
+is shown in Listing \ref{lca}.
+
+\paragraph{Time complexity.} Let's say we have n nodes in the tree and m queries.
+THe DFS runs in $O(n)$ time. Since we use the heuristics optimizations each find
+takes approximately $O(1)$ time for sufficiently big $m$ and so we have
+a total time complexity of $O(n+m)$.
+
+\paragraph{Space complexity.} $O(n)$
+
+\lstinputlisting[caption = offline LCA, label=lca]{code/offlineLCA.cpp}
 \subsection{Job Sequencing}
 \emph{There is a lisr of $n$ jobs, where each job has a deadline $d$ and a profit $p$ if the job
 is completed before the deadline. Find the sublist of jobs that maximizes the total profit, given
 that only one job can be scheduled at a certain moment and completing it takes 1 unit of time.}
-
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{img/jobs.jpeg}
+    \caption{A list of jobs with their profit and deadline}
+\end{figure}
 \bigskip
 A greedy solution \cite{key} sorts the list of jobs by decreasing profit and tries to assign each job to the greatest available slot, ignoring it if no slots
 are found. This algorithm runs in $O(n^2)$.
