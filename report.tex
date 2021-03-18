@@ -348,7 +348,7 @@ of its grandparent $u_{2i+2}$
         return x;
     }
 \end{lstlisting}
-\begin{figure}
+\begin{figure}[h!]
     \includegraphics[width = \linewidth]{img/pc.jpg}
     \caption{(a) The tree before executing \emph{find(F)};
     (b) \emph{find(F)} with path compression;
@@ -357,7 +357,12 @@ of its grandparent $u_{2i+2}$
     }
     \label{fig:pc}   
 \end{figure}
-\section{Time complexity and proof}
+
+\section{Complexity analysis}\label{complex}
+algorithms. From now on we will assume that we are using unionfind with union by rank and path compression,
+but it can be shown that all the other combinations are equivalent in term of total complexity.
+Let's now see some preliminary results.
+
 \section{Applications}
 Let's now see some problems where the DSU data structure shows its power.
 \subsection{Detect cycle in a graph} \label{loop}
@@ -377,9 +382,8 @@ vertex $v \in V$. Now, for every edge $ (u,v) \in E$:\begin{enumerate}
     \item Otherwise, merge the two sets
 \end{enumerate}
 
-\paragraph{Time complexity.} Each \emph{find} and \emph{union} takes $O(\log|V|)$
-at most and we need to do them for every edge $e$. This leads to a total time complexity
-of $O(|E|\log|V|)$.
+\paragraph{Time complexity.} We do $|V|$ makeSet  and atmost $2*|E|$ find and $|V - 1|$ union operations.
+Thanks  to the results shown in section \ref{complex} we know that this takes $O(|E|\alpha(|V|))$ time. 
 \paragraph{Space complexity.} $O(|V|)$
 \lstinputlisting[caption=Cycle detection]{code/graphcycle.cpp}
 \subsection{Kruskal algorithm}
