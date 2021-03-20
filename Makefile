@@ -21,7 +21,8 @@ dvi:
 	bibtex ${filename}||true
 	latex ${filename}
 	latex ${filename}
-
+spellcheck:
+	aspell -t -c ${filename}.tex --lang=en_EN
 
 
 clean:

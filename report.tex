@@ -48,22 +48,19 @@ Suppose we have a collection S of \emph{n} distinct elements, let's say the inte
 
 Initially these elements
 are organized in n disjointed sets \{1\},\{2\},...,\{n\}. For simplicity we will assume that the name of set \{i\}
-is i. In the union find problem we want to mantain a collection of disjointed sets while supporting the following operations:
+is i. In the union find problem we want to maintain a collection of disjointed sets while supporting the following operations:
 \begin{itemize}
     \item \textbf{union}(A, B): join the sets A and B in a single set $A \cup B$. The old sets A and B are destroyed.
     \item \textbf{find}($x$): given an element $x$, return the name of the set that contains it.
 \end{itemize}
-Let's now generalize the problem. We have assumed before that the n elements are already given. This is not true in general, so we need a way to 
+Let's now generalize the problem. We have assumed that the n elements are already given. This is not true in general, so we need a way to 
 add new elements (and consequentially new sets). This is solved by introducing a third operation:
 \begin{itemize}
     \item \textbf{makeSet}($x$): Create a new set {$x$} containing the single element $x$.
 \end{itemize}
-    We will say that the UnionFind problem consists of mantaining a collection of disjointed sets during 
-an arbitrary sequence of \emph{makeSet, union} and \emph{find} operations, starting from thalso be one of the two.
-The algorithm that we use is offline, meaning that it computes a solutione empty set \cite{demetrescu}. Figure \ref{fig:circle} shows a
-simple example where the elements considered are numbers. For the rest of the report we will consider a unionFind problem with
-$n$ makeSet operations and $m$ find operations. Since we have a total of n disjointed sets, we don't have to specify the number
-of union operations, because they cannot be more than $n-1$.
+    We will say that the UnionFind problem consists of maintaining a collection of disjointed sets during 
+an arbitrary sequence of \emph{makeSet, union} and \emph{find} operations, starting from the empty set \cite{demetrescu}. Figure \ref{fig:circle} shows a
+simple example where the elements considered are numbers.
 
 \begin{figure}
     \centering
@@ -108,9 +105,9 @@ of union operations, because they cannot be more than $n-1$.
 \end{figure}
 
 \section{Naive Implementations}
-The general idea for implementing UnionFind is to consider the collection as a forest of trees, with each tree representing a single set. 
-In the following code we will only consider integers as elements and use an array representation of the forest.
-Given an array \emph{parents} the element \emph{parents[i]} contains the direct parent of element \emph{i} in the tree hierarchy. For the root
+The general idea for implementing UnionFind is to represent the collection as a forest of trees, with each tree representing a single set. 
+In the following code we will  consider integers as elements and use an array representation of the forest.
+Given an array \emph{parents} the element \emph{parents[i]} contains the father of element \emph{i} in the tree hierarchy. For the root
 r of a tree we will have parents[r] $=$ r. Before analyzing a more efficient implementation, we will see two simpler versions.
 
 \subsection{QuickFind} \label{QF}
@@ -118,7 +115,7 @@ QuickFind aims at having a very good time complexity for the find operation. To 
 has a pointer to the root of the tree,  and the root contains the name of the set. The find operation simply follows the pointer and returns the name of the
 set. It's easy to see that it has $O(1)$ time complexity. MakeSet(e) creates a new tree composed by two nodes: the root and a single leaf child. It stores e both in the root and
 in the leaf. MakeSet is $O(1)$ as well. The union operation deletes the pointer from the elements to the root of the old tree
-and add new pointers to the root of the new tree. In the worst case, this takes $O(n)$. Figure \ref{fig:quickFind} gives a visualization of this operation. Space complexity is $(O(n)$. 
+and add new pointers to the root of the new tree. In the worst case, this takes $O(n)$. Space complexity is $O(n)$. 
 
 \begin{figure}[h!]
     \centering
@@ -167,8 +164,8 @@ If for example we want to compute find(3) we return the element parents$[3]$;
 
 \subsection{QuickUnion} \label{QU}
 In QuickUnion we also use trees, but they can have height $\neq$ 1. Each element has a pointer to their
-direct parent in the tree. MakeSet(x) creates a single node named x. Union(A,B) makes the root of B a child of the 
-root of A, by simply adding a pointer. The find operation is slightly more complez. Let's say
+father. MakeSet(x) creates a single node named x. Union(A,B) makes the root of B a child of the 
+root of A. The find operation is slightly more complex. Let's say
 we want to compute find(\emph{e}) for a generic \emph{e}. Starting from \emph{e} we repeatedly 
 follow the pointer to the father until we find the root of the tree.
 \begin{figure}[h!]
@@ -189,19 +186,18 @@ Let's discuss the cost of union. As previously said,
 this consists in creating a new pointer from the root of the old tree to the root of the new tree. This can be done 
 very easily in $O(1)$ time. If we look to the implementation in Listing \ref{lab:qu} we notice
 that in the union operation we first call find to find the root of the trees containing the elements. Find takes $O(n)$ and this dominates the 
-total complexity, so the union method in that code takes $ O(n)$ as well. But this is just one possible implementation, and we analyze
+total complexity, so the union method in that code takes $ O(n)$ as well. But this is just one possible implementation. We are analyzing
 the abstract operation, so our previous analysis is still valid. 
 
 \section{Balancing Heuristics}
-Now we will see some heuristics that aim to improve the time complexity of the operations descibed. In particular
-we will first see aan heuristic to improve union in the quickFind algorithm and then various heuristics to improve
+Now we will see some heuristics that aim to improve the time complexity of union find. In particular
+we will first see a heuristic to improve union in the quickFind algorithm and then various heuristics to improve
 find in the QuickUnion algorithm. Note that in this section we will simply describe the techniques while the 
 complexity analysis will be shown in the next part.
 \subsection{Balancing union in QuickFind}
 To improve the performance of QuickFind we must focus on the most expensive operation, which we know is 
-union. We can observe that the implementation that we described in section \ref{QF} is not very smart. The more $ | B | $ the more
-Union(A, B) costs. When we have $|A| < |B| $ it is more efficient to move the nodes of the set A. The new set
-$A \cup B$ will still be named A.
+union. We can observe that the implementation that we described in section \ref{QF} is not very smart. The more $ | B | $ grows the more
+Union(A, B) costs. When we have $|A| < |B| $ it is more efficient to move the nodes of the set A.
 
 \begin{figure}[h!]
     \centering
@@ -227,6 +223,7 @@ $A \cup B$ will still be named A.
 \end{figure}
 In the implementation, we store an auxiliary array \emph{size} which keeps track
 of the cardinality of each set.
+
 \begin{lstlisting}[caption=updated operations in QuickFind, label=lab:qfu]
     QuickFind(int n) : n(n)
     {
@@ -279,10 +276,10 @@ we make the smaller set in size child of the bigger set.
     }
 
 \end{lstlisting}
-\paragraph{Union By Rank} In union by rank we use the depth of the tree instead
+\paragraph{Union By Rank} In union by rank we use the height of the tree instead
 of its size. The approach is the same of Union By size: we attach the shorter tree
-to the taller one. It's important to notice that, when we use compression techniques that we will discuss later, the rank is not always equal to the actual depth of a tree. 
-In this case it gives an upper boiund of the height.  
+to the taller one. It's important to notice that, when we use compression techniques that we will discuss later, the rank is not always equal to the actual height of a tree. 
+In this case it gives an upper bound of the height.  
 \begin{figure}[h!]
     \includegraphics[width=0.9\linewidth]{img/urank.png}
     \caption{Union(A,B) when rank(A) < rank(B)}
@@ -318,7 +315,7 @@ In this case it gives an upper boiund of the height.
 \end{lstlisting}
 To further improve QuickUnion performance we can also modify \emph{find} in order to reduce the height of a tree
 even more. Let $u_0. u_1, \dots, u_{l-1}$ the nodes visited during \emph{find(x)}, where $u_0 = x$ and $u_{l-1}$ is
-the root of the tree containing $x$. We can assume $l \geq 3$, because if $l\leq 2$ we dont need to reduce the height.
+the root of the tree containing $x$. We can assume $l \geq 3$, because if $l\leq 2$ we don't need to reduce the height.
 We can apply one of the following compression heuristics:
 \paragraph{Path compression} \cite{hopcroft1973set} make all the nodes $u_i$ ($ 0 \leq i \leq l-3$) children of the root $u_{l-1}$
 \begin{lstlisting}
@@ -362,16 +359,17 @@ of its grandparent $u_{2i+2}$
 \end{figure}
 \newpage
 \section{Complexity analysis}\label{complex}
-Let's now analyse how much the heuristics can improve the total time complexity. 
-For simplicity, from now we will use only QuickUnion with union by rank 
-and path compression. Note that any combination of  the union and find heuristics gives the same improvement in terms of time complexity. 
+Let's now analyse how much the heuristics can improve the total time complexity. Note that any combination of  the union and find heuristics gives the same improvement in terms of time complexity. 
+
+In particular, we will now see
+how much does union by rank improves the time complexity of find in the QuickUnion version.
+For simplicity, we will not consider any compression heuristic on the find itself for now. 
 Let's start with the following result:
 \begin{lemma}\label{rank}
     A QuickUnion tree balanced by rank has at least $2^{rank(x)}$ nodes, where $x$ is the root of the tree.
 \end{lemma}
 \paragraph{\textbf{Proof.}} We demonstrate the lemma by induction on the number of operations. The base case is trivially proven
-since we have no trees. Now let's assume that the lemma is valid before an operation and we want to prove that it holds afterwards. For simplicity, we will not use
-any compression heuristic on a find for now. This means that when we execute  a find the rank is not modified and so the lemma still holds.
+since we have no trees. Now let's assume that the lemma is valid before an operation and we want to prove that it holds afterwards. When we execute  a find the rank is not modified and so the lemma still holds.
 If we execute a makeSet($x$) we introduce a new tree with the single node $x$, and rank($x$) $ = 0$.
 This tree has $2^{rank(x)} = 2^0 = 1$ node  and the lemma is verified. We now consider a $Union(x, y)$ operation.
 We indicate with $|x|$ and $|y|$ the size of the trees before merging them, while $|x \cup y|$ is the size of the resulting tree. Since the two sets are disjointed
@@ -394,13 +392,13 @@ In each case the lemma is still true after a union. The following corollary is a
     is the total number of makeSet.
 \end{corollary}
 \paragraph{Proof.} Let T be a balanced QuickUnion tree, and let $x$ be its root. We call $size(x)$
-the number of nodes in T. By definition, the hieght of T is $rank(x)$ and $size(x) \leq n$. For Lemma
+the number of nodes in T. By definition, the height of T is $rank(x)$ and $size(x) \leq n$. For Lemma
 \ref{rank} we have $size(x) \geq 2^{rank(x)}$ and, if we combine all these results:
 $$rank(x) \leq \lfloor \log_2 (size(x))\rfloor \leq \lfloor log_2 n \rfloor.$$
 
 \bigskip
 
-This corollary gurantees that, using union by rank, a QuickUnion tree will have $O(\log n)$ height. As we know, the time complexity of find
+This corollary guarantees that, using union by rank, a QuickUnion tree will have $O(\log n)$ height. As we know, the time complexity of find
 is related to the height of the tree and so we can affirm the following result.
 
 \bigskip
@@ -421,7 +419,7 @@ $ rank(x) \leq \lfloor \log_2 n \rfloor$ where $n$ is the total number of nodes.
 In the previous analysis, we did not  consider any compression heuristic during a find. It is necessary to use one of them if we want to improve the time complexity
 even more. 
 Assume that we use Union By Rank combined with path compression.
-In 1973, Hopcroft and Ullman proved that a sequence of $m$ makeSet, find or  union can be done in $O(m\log^* n)$ time, wehre $log^*$ is the iterative
+In 1973, Hopcroft and Ullman proved that a sequence of $m$ makeSet, find or  union can be done in $O(m\log^* n)$ time, where $log^*$ is the iterative
 logarithm and $n$ the number of makeSet executed \cite{hopcroft1973set}. This upper bound was ulteriorly decreased by Tarjan in 1975, who proved that the same sequence of operations
 can be done in $O(m\alpha(n))$ where $\alpha$ is the inverse of the Ackermann function \cite{tarjan1975efficiency}. This function grows even slower than $\log^*$.
 The proof of this bound is very complex and goes beyond the scope of this report, so it is omitted.  
@@ -444,7 +442,7 @@ vertex $v \in V$. Now, for every edge $ (u,v) \in E$:\begin{enumerate}
     \item Otherwise, merge the two sets
 \end{enumerate}
 
-\paragraph{Time complexity.} We do $O(|V|)$ makeSet  and  $O|E|$ find and  union operations.
+\paragraph{Time complexity.} We do $O(|V|)$ makeSet  and  $O(|E|)$ find and  union operations.
 Thanks  to the results shown in section \ref{complex} we know that this takes $O((|V| + |E|)\alpha(|V|))$ time. 
 \paragraph{Space complexity.} $O(|V|)$
 \lstinputlisting[caption=Cycle detection]{code/graphcycle.cpp}
@@ -468,8 +466,9 @@ This algorithm starts from an empty tree and increasingly build the MST with the
     add it to the tree.
     \item Repeat step 2 until there are $|V| - 1$ edges in the tree.
 \end{enumerate}
-The central point of the algorithm is the cycle detection in step \ref{p}.For this we can use a modified version of the algorithm described in \ref{loop}.
-This lead to the solution described in Listing \ref{lb:mst}. 
+The central point of the algorithm is the cycle detection in step \ref{p}. For this we can use a modified version of the algorithm described in \ref{loop}.
+Given a edge $(u,v)$ we find the sets to which $u$ and $v$ belong. If they are not in the same set, they do not form a cycle 
+and so we can add the edge to the current tree and merge the sets together. 
 \paragraph{Time complexity.} Sorting the edges is $O(|E|\log|E|)$. The cycle detection
 part is $O((|V| + |E|)\alpha(|V|))$. Assuming that the graph is connected, we have
  $|E| \geq |V| - 1$, which means that the disjoint sets operations take $O(|E|\alpha(|V|))$. We know that
@@ -480,8 +479,8 @@ part is $O((|V| + |E|)\alpha(|V|))$. Assuming that the graph is connected, we ha
 
 \lstinputlisting[caption=Kruskal Algorithm , label=lb:mst]{code/mst.cpp}
 \subsection{Lowest Common Ancestor in a tree}
-\emph{We have a tree T with  n nodes and m queries (u,v). For each qeury (u, v) we want to find
-the lowest common ancestor(LCA) of u and v, which is the ancestor of both u and v that has the greatest depth in the tree.
+\emph{We have a tree T with  n nodes and m queries (u,v). For each query (u, v) we want to find
+the lowest common ancestor(LCA) of u and v. That is, the ancestor of both u and v that has the greatest depth in the tree.
 }
 \begin{figure}[h!]
     \centering
@@ -500,7 +499,7 @@ the lowest common ancestor(LCA) of u and v, which is the ancestor of both u and 
  (or viceversa). Let's say we are at node u and want to find LCA(u, v). The answer is either v or the lowest node among
 the ancestors of v that is also an ancestor of u. To each ancestor $a$  of $v$ we assign a set
 that contains $a$ itself and all the subtrees with roots in the set of its other children
-that are not in the path to $v$. The set that contains u is the answer to our query. The main task is mantaining
+that are not in the path to $v$. The set that contains u is the answer to our query. The main task is maintaining
 efficiently all these sets, and for this purpose we use union find. We also use an auxiliary vector \emph{ancestor} that
 will store the real representative of each set.
 
@@ -526,8 +525,9 @@ that only one job can be scheduled at a certain moment and completing it takes 1
     \includegraphics[scale=0.5]{img/jobs.jpeg}
     \caption{A list of jobs with their profit and deadline}
 \end{figure}
+
 \bigskip
-A greedy solution \cite{key} sorts the list of jobs by decreasing profit and tries to assign each job to the greatest available slot, ignoring it if no slots
+A greedy solution \cite{key} sorts the list of jobs by decreasing profit and tries to assign each job to the greatest available slot before the deadline, ignoring it if no slots
 are found. This algorithm runs in $O(n^2)$.
 
 \medskip
@@ -546,7 +546,7 @@ we do the following:\begin{enumerate}
     \item find the latest available slot t
     \item if $t \neq 0$ assign it to the current job and
     execute \emph{union(t-1, t)}
-    \item otherwhise, skip this job.
+    \item otherwise, skip this job.
 \end{enumerate}
 
 \paragraph{Time complexity.} Sorting the jobs takes $O(n \log n)$.
