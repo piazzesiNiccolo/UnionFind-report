@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{babel}
-\usepackage{amsthm}
+\usepackage{amssymb,amsmath,amsthm}
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -29,6 +29,8 @@
       \node[minimum size=3mm, draw, circle,fill=black!10] (n\n) at (\n,0) {\textbf{\num}};
     }
 }
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
 \tikzstyle{arrow} = [thick,->,>=stealth]
 \tikzstyle{dashedarrow} = [dashed,->,->=stealth]
 \begin{document}
@@ -279,7 +281,8 @@ we make the smaller set in size child of the bigger set.
 \end{lstlisting}
 \paragraph{Union By Rank} In union by rank we use the depth of the tree instead
 of its size. The approach is the same of Union By size: we attach the shorter tree
-to the taller one.
+to the taller one. It's important to notice that, when we use compression techniques that we will discuss later, the rank is not always equal to the actual depth of a tree. 
+In this case it gives an upper boiund of the height.  
 \begin{figure}[h!]
     \includegraphics[width=0.9\linewidth]{img/urank.png}
     \caption{Union(A,B) when rank(A) < rank(B)}
@@ -357,12 +360,71 @@ of its grandparent $u_{2i+2}$
     }
     \label{fig:pc}   
 \end{figure}
-
+\newpage
 \section{Complexity analysis}\label{complex}
-algorithms. From now on we will assume that we are using unionfind with union by rank and path compression,
-but it can be shown that all the other combinations are equivalent in term of total complexity.
-Let's now see some preliminary results.
+Let's now analyse how much the heuristics can improve the total time complexity. 
+For simplicity, from now we will use only QuickUnion with union by rank 
+and path compression. Note that any combination of  the union and find heuristics gives the same improvement in terms of time complexity. 
+Let's start with the following result:
+\begin{lemma}\label{rank}
+    A QuickUnion tree balanced by rank has at least $2^{rank(x)}$ nodes, where $x$ is the root of the tree.
+\end{lemma}
+\paragraph{\textbf{Proof.}} We demonstrate the lemma by induction on the number of operations. The base case is trivially proven
+since we have no trees. Now let's assume that the lemma is valid before an operation and we want to prove that it holds afterwards. For simplicity, we will not use
+any compression heuristic on a find for now. This means that when we execute  a find the rank is not modified and so the lemma still holds.
+If we execute a makeSet($x$) we introduce a new tree with the single node $x$, and rank($x$) $ = 0$.
+This tree has $2^{rank(x)} = 2^0 = 1$ node  and the lemma is verified. We now consider a $Union(x, y)$ operation.
+We indicate with $|x|$ and $|y|$ the size of the trees before merging them, while $|x \cup y|$ is the size of the resulting tree. Since the two sets are disjointed
+$|x \cup y|$ = $|x| + |y|$.
+We have three separate cases:\begin{enumerate}
+    \item If $rank(y) < rank(x)$ the root of $y$ becomes a child of the root of $x$. The root of the new tree will have $rank(x \cup y)$ = rank($x$). 
+    By inductive hypothesis we have $|x| \geq 2^{rank(x)}\text{ and }|y| \geq 2^{rank(y)}$ and the number
+    of nodes in the resulting tree is:
+    $$ |x\cup y| = |x| + |y| \geq 2^{rank(x)} + 2^{rank(y)} > 2^{rank(x)} = 2^{rank(x \cup y)} $$
+    \item If $rank(y) < rank(x)$ we follow the same reasoning of the first case with the difference that
+    the root of $x$ becomes a child of the root of $y$.
+    $$ |x\cup y| = |x| + |y| \geq 2^{rank(x)} + 2^{rank(y)} > 2^{rank(y)} = 2^{rank(x \cup y)} $$
+    \item When $rank(x) = rank(y)$ the union makes the root of $y$ child of the root of $x$ and updates $rank(x)$ to $rank(x) + 1$. This is also the value of $rank(x\cup y)$.
+    By using the inductive hypotheses, the number of nodes in new tree is:
+    $$  |x\cup y| = |x| + |y| \geq 2^{rank(x)} + 2^{rank(y)} \geq 2\cdot2^{rank(x)} = 2^{rank(x) + 1} = 2^{rank(x \cup y)} $$
+\end{enumerate}
+In each case the lemma is still true after a union. The following corollary is an immediate consequence.
+\begin{corollary}
+    During a sequence of makeSet, union and find, the height of a balanced QuickUnion tree has a $\lfloor \log_2 n \rfloor$ upper bound, where $n$
+    is the total number of makeSet.
+\end{corollary}
+\paragraph{Proof.} Let T be a balanced QuickUnion tree, and let $x$ be its root. We call $size(x)$
+the number of nodes in T. By definition, the hieght of T is $rank(x)$ and $size(x) \leq n$. For Lemma
+\ref{rank} we have $size(x) \geq 2^{rank(x)}$ and, if we combine all these results:
+$$rank(x) \leq \lfloor \log_2 (size(x))\rfloor \leq \lfloor log_2 n \rfloor.$$
 
+\bigskip
+
+This corollary gurantees that, using union by rank, a QuickUnion tree will have $O(\log n)$ height. As we know, the time complexity of find
+is related to the height of the tree and so we can affirm the following result.
+
+\bigskip
+
+\emph{QuickUnion trees balanced by height support makeSet and union operations in constant time. A find takes $O(\log n)$
+in the worst case, where $n$ is the total numbers of makeSet executed.}
+
+During any sequence of the operations described, the following properties are verified:
+\paragraph{Property 1.} The rank of a generic node $x$ is initially 0 and increases until x remains a root. As soon as x is not root anymore, its rank
+remains unchanged.
+\paragraph{Property 2.} Let $x$ be a generic, non root node and let $p(x)$ be its father node.
+$$rank(p(x)) > rank(x)$$ 
+\paragraph{Property 3.} As a consequence of Lemma \ref{rank}, for each node $x$ we have
+$ rank(x) \leq \lfloor \log_2 n \rfloor$ where $n$ is the total number of nodes.
+
+\bigskip
+
+In the previous analysis, we did not  consider any compression heuristic during a find. It is necessary to use one of them if we want to improve the time complexity
+even more. 
+Assume that we use Union By Rank combined with path compression.
+In 1973, Hopcroft and Ullman proved that a sequence of $m$ makeSet, find or  union can be done in $O(m\log^* n)$ time, wehre $log^*$ is the iterative
+logarithm and $n$ the number of makeSet executed \cite{hopcroft1973set}. This upper bound was ulteriorly decreased by Tarjan in 1975, who proved that the same sequence of operations
+can be done in $O(m\alpha(n))$ where $\alpha$ is the inverse of the Ackermann function \cite{tarjan1975efficiency}. This function grows even slower than $\log^*$.
+The proof of this bound is very complex and goes beyond the scope of this report, so it is omitted.  
 \section{Applications}
 Let's now see some problems where the DSU data structure shows its power.
 \subsection{Detect cycle in a graph} \label{loop}
@@ -406,8 +468,8 @@ This algorithm starts from an empty tree and increasingly build the MST with the
     add it to the tree.
     \item Repeat step 2 until there are $|V| - 1$ edges in the tree.
 \end{enumerate}
-The central point of the algorithm is the cycle detection in step \ref{p}.For this we can use a modified version of the algorithm described in \ref{loop}. This lead to the solution 
-described in Listing \ref{lb:mst} 
+The central point of the algorithm is the cycle detection in step \ref{p}.For this we can use a modified version of the algorithm described in \ref{loop}.
+This lead to the solution described in Listing \ref{lb:mst}. 
 \paragraph{Time complexity.} Sorting the edges is $O(|E|\log|E|)$. The cycle detection
 part is $O((|V| + |E|)\alpha(|V|))$. Assuming that the graph is connected, we have
  $|E| \geq |V| - 1$, which means that the disjoint sets operations take $O(|E|\alpha(|V|))$. We know that
