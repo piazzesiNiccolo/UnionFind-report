@@ -26,7 +26,7 @@ std::vector<Lca> lca(std::vector<std::vector<int>> &tree,
         {
             if (visited[q])
             {
-                lca.emplace_back(v, q, uf.find(q));
+                lca.emplace_back(v, q, ancestor[uf.find(q)]);
             }
         }
     };

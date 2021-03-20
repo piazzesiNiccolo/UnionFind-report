@@ -382,8 +382,8 @@ vertex $v \in V$. Now, for every edge $ (u,v) \in E$:\begin{enumerate}
     \item Otherwise, merge the two sets
 \end{enumerate}
 
-\paragraph{Time complexity.} We do $|V|$ makeSet  and atmost $2*|E|$ find and $|V - 1|$ union operations.
-Thanks  to the results shown in section \ref{complex} we know that this takes $O(|E|\alpha(|V|))$ time. 
+\paragraph{Time complexity.} We do $O(|V|)$ makeSet  and  $O|E|$ find and  union operations.
+Thanks  to the results shown in section \ref{complex} we know that this takes $O((|V| + |E|)\alpha(|V|))$ time. 
 \paragraph{Space complexity.} $O(|V|)$
 \lstinputlisting[caption=Cycle detection]{code/graphcycle.cpp}
 \subsection{Kruskal algorithm}
@@ -408,7 +408,13 @@ This algorithm starts from an empty tree and increasingly build the MST with the
 \end{enumerate}
 The central point of the algorithm is the cycle detection in step \ref{p}.For this we can use a modified version of the algorithm described in \ref{loop}. This lead to the solution 
 described in Listing \ref{lb:mst} 
-\paragraph{Time complexity.} $O(|E|\log|E|)$
+\paragraph{Time complexity.} Sorting the edges is $O(|E|\log|E|)$. The cycle detection
+part is $O((|V| + |E|)\alpha(|V|))$. Assuming that the graph is connected, we have
+ $|E| \geq |V| - 1$, which means that the disjoint sets operations take $O(|E|\alpha(|V|))$. We know that
+ $\alpha(|V|) = O(\log|V|)$, and this tells us that the total time complexity of Kruskal's algorithm
+ is $O(|E|\log|E|)$. From graph theory we observe that $|E| < |V|^2$. If we apply the logarithm 
+ $\log|E| = O(\log|V|))$,and so we can reestablish the total time complexity as:
+ $$O(|E|\log|V|)$$
 
 \lstinputlisting[caption=Kruskal Algorithm , label=lb:mst]{code/mst.cpp}
 \subsection{Lowest Common Ancestor in a tree}
@@ -441,15 +447,16 @@ queries(u, v) in which v has already been visited. This will be ancestor[\emph{f
 is shown in Listing \ref{lca}.
 
 \paragraph{Time complexity.} Let's say we have n nodes in the tree and m queries.
-THe DFS runs in $O(n)$ time. Since we use the heuristics optimizations each find
-takes approximately $O(1)$ time for sufficiently big $m$ and so we have
-a total time complexity of $O(n+m)$.
+The DFS runs in $O(n)$ time. For each of the n nodes we do a find operation and a union operation. Together
+with the n makeSet this takes $O(n\alpha(n))$ amortized time.
+The total time complexity is: 
+$$O(n\alpha(n) + m)$$
 
 \paragraph{Space complexity.} $O(n)$
 
 \lstinputlisting[caption = offline LCA, label=lca]{code/offlineLCA.cpp}
 \subsection{Job Sequencing}
-\emph{There is a lisr of $n$ jobs, where each job has a deadline $d$ and a profit $p$ if the job
+\emph{There is a list of $n$ jobs, where each job has a deadline $d$ and a profit $p$ if the job
 is completed before the deadline. Find the sublist of jobs that maximizes the total profit, given
 that only one job can be scheduled at a certain moment and completing it takes 1 unit of time.}
 \begin{figure}[h!]
@@ -480,8 +487,8 @@ we do the following:\begin{enumerate}
     \item otherwhise, skip this job.
 \end{enumerate}
 
-\paragraph{Time complexity.} Sorting the jobs takes $O(n \log n)$. For each iteration of the cycle
-the find can take at most $O(\log n)$. The total time complexity is $O(n\log n + n\log n) = O(n\log n)$.
+\paragraph{Time complexity.} Sorting the jobs takes $O(n \log n)$.
+A find can take at most $O(\log n)$ and so the total time complexity is still $O(n\log n)$.
 \paragraph{Space complexity.} $O(m)$ where m is the maximum deadline.
 \lstinputlisting[caption=Job sequencing, label=jbseq]{code/job_sequencing.cpp}
 \bibliographystyle{unsrt}
