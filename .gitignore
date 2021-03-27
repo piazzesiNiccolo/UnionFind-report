@@ -13,7 +13,7 @@
 .*.lb
 
 ## Intermediate documents:
-*.pdf
+
 *.ps
 *.dvi
 *.xdv
